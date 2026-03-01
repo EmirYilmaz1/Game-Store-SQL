@@ -1,0 +1,119 @@
+CREATE DATABASE GameStoreDB
+GO
+USE GameStoreDB
+
+CREATE TABLE Developer
+(
+	DeveloperId INT PRIMARY KEY IDENTITY(1,1),
+	DeveloperName NVARCHAR(40) UNIQUE NOT NULL
+)
+
+CREATE TABLE Genre
+(
+	GenreId INT PRIMARY KEY IDENTITY(1,1),
+	GenreName NVARCHAR(20) UNIQUE NOT NULL
+)
+
+GO
+
+CREATE TABLE Game
+(
+	GameId INT PRIMARY KEY IDENTITY(1,1),
+	GameName NVARCHAR(50) UNIQUE NOT NULL,
+	GameDescription NVARCHAR(50),
+	Price MONEY NOT NULL,
+	ReleaseDate DATE,
+	DeveloperId INT NOT NULL,
+
+	CONSTRAINT FK_Game_Developer_id FOREIGN KEY (DeveloperID) REFERENCES Developer(DeveloperId)
+)
+
+
+GO
+
+CREATE TABLE Games_Genre
+(
+	GameID INT NOT NULL,
+	GenreID INT NOT NULL,
+
+	CONSTRAINT PK_Games_Genre PRIMARY KEY(GameID,GenreID),
+	CONSTRAINT FK_Game FOREIGN KEY(GameID) REFERENCES Game(GameId) ON DELETE CASCADE,
+	CONSTRAINT FK_Genre FOREIGN KEY(GenreID) REFERENCES Genre(GenreId) ON DELETE CASCADE
+)
+
+GO
+
+CREATE TABLE Branch
+(
+	BranchId INT PRIMARY KEY IDENTITY(1,1),
+	StoreLocation NVARCHAR(40) UNIQUE NOT NULL,
+	ManagerId INT NOT NULL
+)
+
+GO
+
+CREATE TABLE Employee
+(
+	EmployeeId INT PRIMARY KEY IDENTITY(1,1),
+	Age INT NOT NULL,
+	Salary  INT NOT NULL,
+	Birthday DATE NOT NULL,
+	BranchId  INT NOT NULL,
+	ManagerId INT NULL,
+
+	CONSTRAINT FK_Employee_Branch_id FOREIGN KEY(BranchId) REFERENCES Branch(BranchId),
+	CONSTRAINT FK_Employee_id FOREIGN KEY(ManagerId) REFERENCES Employee(EmployeeId)
+
+)
+
+GO
+
+ALTER TABLE Branch
+ADD CONSTRAINT FK_Branch_Employee_id FOREIGN KEY(ManagerId) REFERENCES Employee(EmployeeId)
+
+CREATE TABLE Customer 
+(
+	CustomerId INT PRIMARY KEY IDENTITY(1,1),
+	CustomerName NVARCHAR(40),
+	Age INT,
+	Email NVARCHAR(45)
+)
+
+CREATE TABLE Stocks
+(
+	BranchId INT NOT NULL,
+	GameId INT NOT NULL,
+	StockQuantity INT NOT NULL,
+
+
+	CONSTRAINT PK_Branch_Game PRIMARY KEY(BranchId, GameId),
+	CONSTRAINT FK_Stocks_Barnch_ID FOREIGN KEY (BranchID) REFERENCES Branch(BranchId),
+	CONSTRAINT FK_Stocks_Game_ID FOREIGN KEY (GameID) REFERENCES Game(GameId)
+)
+
+GO 
+
+CREATE TABLE Orders
+(
+	OrderId INT PRIMARY KEY IDENTITY(1,1),
+	OrderDate DATE NOT NULL,
+	BranchId INT NOT NULL,
+	CustomerId INT NOT NULL
+
+	CONSTRAINT FK_Order_Branch_id FOREIGN KEY (BranchId) REFERENCES Branch(BranchId),
+	CONSTRAINT FK_Order_Customer_id FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId)
+)
+
+GO
+
+CREATE TABLE OrderDetail
+(
+	OrderId INT NOT NULL,
+	GameId INT NOT NULL,
+	Quantity INT NOT NULL,
+	UnitPrice INT NOT NULL,
+
+	CONSTRAINT PK_Order_Game PRIMARY KEY(OrderId,GameId),
+	CONSTRAINT FK_OrderDetail_Orders_id FOREIGN KEY (OrderId) REFERENCES Orders(OrderId),
+	CONSTRAINT FK_OrderDetail_Game_id FOREIGN KEY (GameId) REFERENCES Game(GameId)
+)
