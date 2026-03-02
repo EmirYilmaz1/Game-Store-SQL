@@ -20,13 +20,15 @@ CREATE TABLE Game
 (
 	GameId INT PRIMARY KEY IDENTITY(1,1),
 	GameName NVARCHAR(50) UNIQUE NOT NULL,
-	GameDescription NVARCHAR(50),
+	GameDescription NVARCHAR(1000),
 	Price MONEY NOT NULL,
 	ReleaseDate DATE,
 	DeveloperId INT NOT NULL,
 
 	CONSTRAINT FK_Game_Developer_id FOREIGN KEY (DeveloperID) REFERENCES Developer(DeveloperId)
 )
+
+
 
 
 GO
@@ -55,8 +57,9 @@ GO
 CREATE TABLE Employee
 (
 	EmployeeId INT PRIMARY KEY IDENTITY(1,1),
+	EmployeeName NVARCHAR(40) NOT NULL,
 	Age INT NOT NULL,
-	Salary  INT NOT NULL,
+	Salary  MONEY NOT NULL,
 	Birthday DATE NOT NULL,
 	BranchId  INT NOT NULL,
 	ManagerId INT NULL,
@@ -111,7 +114,7 @@ CREATE TABLE OrderDetail
 	OrderId INT NOT NULL,
 	GameId INT NOT NULL,
 	Quantity INT NOT NULL,
-	UnitPrice INT NOT NULL,
+	UnitPrice MONEY NOT NULL,
 
 	CONSTRAINT PK_Order_Game PRIMARY KEY(OrderId,GameId),
 	CONSTRAINT FK_OrderDetail_Orders_id FOREIGN KEY (OrderId) REFERENCES Orders(OrderId),
