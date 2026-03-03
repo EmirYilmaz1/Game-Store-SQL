@@ -49,7 +49,7 @@ CREATE TABLE Branch
 (
 	BranchId INT PRIMARY KEY IDENTITY(1,1),
 	StoreLocation NVARCHAR(40) UNIQUE NOT NULL,
-	ManagerId INT NOT NULL
+	ManagerId INT NULL
 )
 
 GO
