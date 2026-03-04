@@ -8,6 +8,7 @@
 -- FOR ADD STOCK sp_AddStock
 -- FOR ADD ORDER sp_AddOrder
 -- FOR ADD ORDERDETAIL sp_AddOrderDetail
+-- FOR TRANSFER GAMES BETWEEN STORES sp_TransferGame
 USE GameStoreDB
 GO
  CREATE PROC sp_AddDeveloper
@@ -114,3 +115,31 @@ CREATE PROC sp_OrderDetail
 	@UnitPrice MONEY
 )AS
 INSERT INTO OrderDetail(OrderId,GameId,Quantity,UnitPrice) VALUES(@OrderId,@GameId,@Quantity,@UnitPrice)
+
+GO 
+
+-- Transfer the game from Branch1ToBranch2
+CREATE PROC sp_TransferGame
+(
+	@Branch1Id INT,
+	@Branch2Id INT,
+	@GameId INT
+
+) AS
+IF EXISTS( SELECT * FROM Stocks WHERE BranchId = @Branch1Id AND GameId = @GameId AND StockQuantity>=1)
+	BEGIN
+		UPDATE Stocks SET StockQuantity = StockQuantity-1 WHERE BranchId = @Branch1Id AND GameId = @GameId
+		
+		DELETE FROM Stocks WHERE BranchId = @Branch1Id AND GameId = @GameId AND StockQuantity <= 0;
+
+		
+		IF NOT EXISTS (SELECT * FROM Stocks WHERE BranchId = @Branch2Id AND GameId = @GameId)
+		EXEC sp_AddStock @Branch2Id,@GameId, 1
+		ELSE
+		UPDATE Stocks SET StockQuantity = StockQuantity+1 WHERE BranchId = @Branch2Id AND GameId = @GameId
+
+	END
+ELSE
+	PRINT 'Game is out of stock in the current branch'
+
+	GO
